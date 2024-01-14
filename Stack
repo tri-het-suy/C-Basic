@@ -1,0 +1,71 @@
+#include<stdio.h>
+#include<math.h>
+#include<ctype.h>
+#include<string.h>
+#include<stdlib.h>
+typedef struct node{
+	int  data;
+	struct node *next;
+}node;
+
+typedef struct Stack{
+    node *top;
+}Stack;
+
+node *makeNode(int x){
+	node *newNode=(node*)malloc(sizeof(node));
+	newNode->data=x;
+	newNode->next=NULL;
+	return newNode;
+}
+
+Stack *createstack(){
+	Stack *newStack=(Stack*)malloc(sizeof(Stack));
+	newStack->top=NULL;
+	return newStack;
+}
+
+int isEmpty(Stack *a){
+	return a->top==NULL;
+}
+
+void push(Stack *a,int data){
+	node *newNode=makeNode(data);
+	newNode->next=a->top;
+	a->top=newNode;
+}
+
+int pop(Stack *a){
+	if(isEmpty(a)){
+		printf("Stack is EMPTY");
+		return -1;
+	}
+	node *crr=a->top;
+	int data=crr->data;
+	a->top=crr->next;
+	free(crr);
+	return data;
+}
+//lay gia tri o dinh ma ko xoa di
+int peek(Stack *a){
+	if(isEmpty(a)){
+		printf("Stack is EMPTY");
+		return -1;
+	}
+	return a->top->data;
+}
+void inStack(Stack *a){
+	node *tmp=a->top;
+	while(tmp!=NULL){
+		printf("%d ",tmp->data);
+		tmp=tmp->next;
+	}
+}
+int main(){
+	Stack *stack=createstack();
+	push(stack,1);
+	push(stack,2);
+	pop(stack);
+	inStack(stack);
+	return 0;
+}
