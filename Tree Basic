@@ -1,0 +1,153 @@
+#include<stdio.h>
+#include<math.h>
+#include<ctype.h>
+#include<string.h>
+#include<stdlib.h>
+#include<stdbool.h>
+typedef struct node{
+    int data;
+    struct node **child;
+    int cnt;
+}node;
+node *makeNode(int x){
+    node *newNode=(node*)malloc(sizeof(node));
+    newNode->cnt=0;
+    newNode->data=x;
+    newNode->child=NULL;
+    return newNode;
+}
+bool check(node *root,int u){
+	if(root==NULL)
+		return false;
+	if(root->data==u)
+		return true;
+	bool ok=false;
+	for(int i=0;i<root->cnt;i++)
+		ok=ok||check(root->child[i],u);
+	return ok;
+}
+void insert(node *root,int u,int v){
+	if(root==NULL)
+		return;
+	if(root->data==v){
+		root->cnt++;
+		root->child=(node**)realloc(root->child,root->cnt*sizeof(node*));
+		root->child[root->cnt-1]=makeNode(u);
+	}
+	for(int i=0;i<root->cnt;i++)
+		insert(root->child[i],u,v);
+}
+
+node *find(node *root,int data){
+	if(root==NULL)
+		return NULL;
+	if(root->data==data)
+		return root;
+	node* result = NULL;
+    for (int i = 0; i < root->cnt; i++) {
+        result = find(root->child[i], data);
+        if (result != NULL)
+            break;
+    }
+    return result;
+}
+int height(node *root){
+	if(root==NULL)
+		return 0;
+	int res=1;
+	for(int i=0;i<root->cnt;i++)
+		res=fmax(res,1+height(root->child[i]));
+	return res;	
+}
+int depth(node *root,int data,int crr){
+	if(root==NULL)
+		return -1;
+	if(root->data==data)
+		return crr;
+	for(int i=0;i<root->cnt;i++){
+		int tmp=depth(root->child[i],data,crr+1);
+		if(tmp!=-1)
+			return tmp;
+	}
+	return -1;
+}	
+void inorder(node *root){
+	if(root!=NULL){
+		if(root->cnt)
+			inorder(root->child[0]);
+		printf("%d ",root->data);
+		for(int i=1;i<root->cnt;i++)
+			inorder(root->child[i]);
+	}
+}
+void preorder(node *root){
+	if(root!=NULL){
+		printf("%d ",root->data);
+		if(root->cnt){
+			for(int i=0;i<root->cnt;i++)
+				preorder(root->child[i]);
+		}
+	}
+}
+void postorder(node *root){
+	if(root!=NULL){
+		if(root->cnt){
+			for(int i=0;i<root->cnt;i++)
+				postorder(root->child[i]);
+		}
+		printf("%d ",root->data);
+	}
+}
+int count(node *root,int k){
+	if(root==NULL)
+		return 0;
+	
+	int sum=0;
+	for(int i=0;i<root->cnt;i++){
+		sum+=count(root->child[i],k);
+	}
+	if(root->cnt==k)
+		return sum+1;
+	return sum;
+}
+int demla(node *root){
+	if(root==NULL)
+		return 0;
+	if(root->cnt==0)
+		return 1;
+	int sum=0;
+	for(int i=0;i<root->cnt;i++){
+		sum+=demla(root->child[i]);
+	}
+	return sum;
+}
+int main(){
+	node *root=NULL;
+    while(1){
+        char c[100];
+        scanf("%s",&c);
+        if(strcmp(c,"MakeRoot")==0){
+        	int x;
+        	scanf("%d",&x);
+        	root=makeNode(x);
+		}
+		else if(strcmp(c,"Insert")==0){
+			int u,v;
+			scanf("%d%d",&u,&v);
+			if(!check(root,u)&&check(root,v))
+				insert(root,u,v);
+		}
+		else if(strcmp(c,"CountLeaves")==0){
+			int x;scanf("%d",&x);
+			node *tmp=find(root,x);
+			printf("%d\n",demla(tmp));
+		}
+		else if(strcmp(c,"CountKChildren")==0){
+			int x,y;scanf("%d%d",&x,&y);
+			printf("%d\n",count(find(root,x),y));
+		}
+		else if(strcmp(c,"*")==0)
+			break;
+    }
+    return 0;
+}
